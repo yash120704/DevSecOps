@@ -86,11 +86,19 @@ CORS_ALLOWED_ORIGINS=https://your-app.vercel.app
 ```
 
 ### Step 3E: Add Redis
-1. Go to backend service
-2. Click **Environment** → **Add Dependency**
-3. Select **Redis** → **Create**
+1. Go to https://upstash.com/
+2. Sign in with GitHub
+3. Click **Create Database**
+4. Choose **Redis** and select the **free** plan
+5. Copy the Redis connection URL from Upstash
+6. Add it to your Render backend environment variables:
 
-**Render will auto-add CELERY_BROKER_URL and CELERY_RESULT_BACKEND**
+```env
+CELERY_BROKER_URL=redis://default:password@your-upstash-host:6379
+CELERY_RESULT_BACKEND=redis://default:password@your-upstash-host:6379
+```
+
+If Upstash gives you `rediss://...`, use that exact URL in both variables.
 
 ### Step 3F: Get Backend URL
 After service is built and running, copy URL: `https://your-backend.onrender.com`

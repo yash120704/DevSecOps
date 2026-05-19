@@ -6,7 +6,7 @@
 - 🚀 **Backend**: Render (auto-deploy from GitHub)
 - 🗄️ **Database**: Supabase PostgreSQL
 - 📧 **Email**: Supabase Auth + Mailgun SMTP
-- ⚡ **Task Queue**: Redis (via Render)
+- ⚡ **Task Queue**: Redis (via Upstash free tier)
 
 ---
 
@@ -188,14 +188,24 @@ python3 -c "from django.core.management.utils import get_random_secret_key; prin
 
 ### 3.6 Add Redis (for Celery)
 
-Render free tier includes 0.25GB Redis. Add after service creation:
+Use **Upstash Redis** because it is easy to find, has a free tier, and works well with Render.
 
-1. Go to your backend service
-2. Click **Environment** → **Add Dependency**
-3. Select **Redis**
-4. Click **Create Database**
+1. Go to https://upstash.com/
+2. Sign in with GitHub
+3. Click **Create Database**
+4. Choose **Redis**
+5. Select the **free** plan
+6. Create the database
+7. Copy the **Redis URL** or **REST URL** from the Upstash dashboard
 
-Render will automatically add `REDIS_URL` environment variable.
+Add the Redis connection to your Render backend environment variables:
+
+```env
+CELERY_BROKER_URL=redis://default:password@your-upstash-host:6379
+CELERY_RESULT_BACKEND=redis://default:password@your-upstash-host:6379
+```
+
+If Upstash gives you a `rediss://` URL, use that exact URL in both variables.
 
 ### 3.7 Deploy Backend
 
@@ -481,7 +491,7 @@ No active worker found
 | **Vercel** | 100 GB/month bandwidth | Auto-scaling |
 | **Render** | 750 hours/month | 0.5GB RAM web service |
 | **Render Database** | 1 PostgreSQL database | 1GB storage |
-| **Render Redis** | 0.25GB Redis | Included |
+| **Upstash Redis** | Free Redis tier | Included |
 | **Supabase** | 500MB database | 1GB file storage |
 | **Mailgun** | 100 emails/day | Sandbox mode |
 | **Total Cost** | **$0/month** | ✅ Free tier sufficient for MVP |

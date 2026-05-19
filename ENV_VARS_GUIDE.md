@@ -63,9 +63,9 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
-# Redis (Render auto-provides this after adding Redis)
-CELERY_BROKER_URL=redis://default:password@your-redis-host:6379
-CELERY_RESULT_BACKEND=redis://default:password@your-redis-host:6379
+# Redis (use Upstash free tier)
+CELERY_BROKER_URL=redis://default:password@your-upstash-host:6379
+CELERY_RESULT_BACKEND=redis://default:password@your-upstash-host:6379
 
 # CORS (your Vercel frontend URL)
 CORS_ALLOWED_ORIGINS=https://your-app.vercel.app
@@ -128,11 +128,12 @@ VITE_API_URL=https://[YOUR_RENDER_SERVICE].onrender.com
 3. Top of page shows: `https://devsecops-backend.onrender.com`
 4. Or Settings → Look for "Service URL"
 
-### Render Redis URL
-1. After adding Redis dependency
-2. Go to your backend service
-3. Environment Variables section shows `REDIS_URL` (Render auto-sets this)
-4. It will look like: `redis://default:PASSWORD@HOST:6379`
+### Upstash Redis URL
+1. Go to https://upstash.com/
+2. Create a Redis database on the free plan
+3. Open the database details page
+4. Copy the Redis URL shown there
+5. Paste the exact URL into `CELERY_BROKER_URL` and `CELERY_RESULT_BACKEND`
 
 ### Vercel Frontend URL
 1. Log in to Vercel
