@@ -398,19 +398,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## 📸 Screenshots
 
 ### Landing Page
-![Home Page](/public/landing.jpg)
+<img width="1888" height="901" alt="image" src="https://github.com/user-attachments/assets/8fada598-0ed6-42a6-93db-f4998be27923" />
 
 ### Dashboard
-![Dashboard](/public/dashboard.jpg)
+<img width="1892" height="801" alt="image" src="https://github.com/user-attachments/assets/55f8aa2c-d6e6-4323-8aa2-abec54e5acfe" />
 
 ### Scan Report
-![Scan Report](/public/report.jpg)
+<img width="1725" height="968" alt="image" src="https://github.com/user-attachments/assets/76c25f16-df80-4622-acee-8935797f4f14" />
 
-### Security Details
+### Login/Register Page
 ![Security Details](/public/security.jpg)
 
-### Real-time Scan Status
-![Scan Status](/public/status.jpg)
 
 ---
 
