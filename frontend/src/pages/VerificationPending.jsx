@@ -1,19 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, ArrowRight } from 'lucide-react';
-import { useEffect } from 'react';
-import useAuth from '../hooks/useAuth';
 
 export default function VerificationPending() {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  // If already authenticated, redirect to dashboard
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
   return (
     <section className="min-h-[calc(100vh-68px)] flex items-center justify-center px-4 py-10">
       <div className="glass-panel rounded-2xl p-8 w-full max-w-md text-center">

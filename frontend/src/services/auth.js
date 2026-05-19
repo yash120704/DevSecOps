@@ -38,9 +38,13 @@ export async function loginUser(email, password) {
 
 export async function registerUser(email, password) {
   const { data } = await api.post('/auth/register/', { email, password });
+  // Only save session if we have an access token (user verified email)
+  // After signup, Supabase requires email verification, so session will be null
   if (data?.session?.access_token) {
     saveSession(data);
   }
+  // Don't save user data yet - they need to verify email first
+  // The user will be auto-logged in after clicking verification link
   return data;
 }
 
