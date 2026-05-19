@@ -28,7 +28,8 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logoutUser();
-    navigate('/');
+    // Force a small delay to ensure state updates propagate
+    setTimeout(() => navigate('/'), 100);
   };
 
   return (

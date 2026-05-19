@@ -41,7 +41,10 @@ export function AuthProvider({ children }) {
       },
       async logout() {
         await logoutUser();
+        // Explicitly set user to null to trigger re-render
         setUser(null);
+        // Small delay to ensure all listeners have been called
+        return new Promise(resolve => setTimeout(resolve, 50));
       },
     }),
     [user, loading]
