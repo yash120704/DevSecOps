@@ -158,7 +158,7 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_WORKER_POOL = os.environ.get('CELERY_WORKER_POOL', 'solo' if os.name == 'nt' else 'prefork')
 
 # Scanning Configuration
-SCAN_TIMEOUT = 60  # seconds
+SCAN_TIMEOUT = 120  # seconds (2 minutes)
 TEMP_SCAN_DIR = os.path.join(BASE_DIR, 'temp_scans')
 os.makedirs(TEMP_SCAN_DIR, exist_ok=True)
 

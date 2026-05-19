@@ -291,7 +291,7 @@ def _check_node_dependencies(repo_path: Path) -> dict:
             cwd=str(repo_path),
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=120,
         )
         
         # npm audit exit codes: 0 = no vulns, 1 = vulns found, other = error

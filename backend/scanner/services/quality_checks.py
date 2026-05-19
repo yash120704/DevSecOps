@@ -161,7 +161,7 @@ def _check_complexity(repo_path: Path) -> dict:
             }
         
         # Run radon complexity check with exclusions for heavy directories
-        # Increased timeout to 60 seconds and exclude common non-essential folders
+        # Increased timeout to 120 seconds and exclude common non-essential folders
         radon_result = subprocess.run(
             [
                 'radon', 'cc', '.', '-a', '-nb',
@@ -171,7 +171,7 @@ def _check_complexity(repo_path: Path) -> dict:
             cwd=str(repo_path),
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=120,
         )
         
         # Parse output for high complexity functions
