@@ -52,15 +52,20 @@ def login_view(request):
     User login endpoint.
     Expected POST data: {email, password}
     """
+    logger.info(f"Login request received. Content-Type: {request.content_type}, Data: {request.data}")
+    
     serializer = LoginSerializer(data=request.data)
     if not serializer.is_valid():
+        logger.error(f"Login serializer validation failed: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     try:
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
         
+        logger.info(f"Attempting login for email: {email}")
         result = supabase.login_user(email, password)
+        logger.info(f"Login successful for email: {email}")
         
         return Response({
             'success': True,
@@ -70,7 +75,7 @@ def login_view(request):
         }, status=status.HTTP_200_OK)
     
     except Exception as e:
-        logger.error(f"Login error: {e}")
+        logger.error(f"Login error: {str(e)}", exc_info=True)
         return Response({
             'success': False,
             'error': 'Invalid email or password'
