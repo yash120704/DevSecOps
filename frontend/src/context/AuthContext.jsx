@@ -36,7 +36,12 @@ export function AuthProvider({ children }) {
       },
       async register(email, password) {
         const data = await registerUser(email, password);
-        setUser(data.user || null);
+        // Only set user if they have a session token (email verified)
+        // After registration, Supabase requires email verification first
+        if (data?.session?.access_token) {
+          setUser(data.user || null);
+        }
+        // Otherwise, leave user as null - they need to verify email first
         return data;
       },
       async logout() {

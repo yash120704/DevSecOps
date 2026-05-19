@@ -1,48 +1,32 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { CheckCircle2, LogIn, Home } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import supabaseClient from '../services/supabaseClient';
 
 export default function VerificationSuccess() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [verified, setVerified] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleVerification = async () => {
-      try {
-        // Check if redirected from Supabase with email verification
-        const type = searchParams.get('type');
-        const token = searchParams.get('token');
+    // Check if we have the verification parameters
+    const type = searchParams.get('type');
+    const hasToken = searchParams.has('token');
+    
+    // Log for debugging
+    console.log('Auth callback params:', { type, hasToken, hash: location.hash, search: location.search });
 
-        if (type === 'signup' && token) {
-          // Supabase has already handled the verification
-          // The user session might be created automatically
-          // Check current session
-          const { data } = await supabaseClient.auth.getSession();
-          if (data?.session) {
-            // User is verified and has a valid session
-            setVerified(true);
-          } else {
-            // Token in URL but no session created
-            // This means the link might be expired or invalid
-            setError('Email verification link expired or invalid');
-          }
-        } else {
-          setError('Invalid verification link');
-        }
-      } catch (err) {
-        console.error('Verification error:', err);
-        setError('Error verifying email');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    handleVerification();
-  }, [searchParams]);
+    // Supabase sends type=signup when email is verified
+    if (type === 'signup' || type === 'email_change') {
+      setVerified(true);
+    } else if (location.hash.includes('type=signup') || location.hash.includes('type=email_change')) {
+      // Handle hash-based params
+      setVerified(true);
+    }
+    
+    setLoading(false);
+  }, [searchParams, location]);
 
   if (loading) {
     return (
@@ -91,24 +75,26 @@ export default function VerificationSuccess() {
           </>
         ) : (
           <>
-            <p className="text-xs text-rose-300 tracking-[0.2em] mb-3">VERIFICATION FAILED</p>
-            <h1 className="heading-display text-3xl text-rose-100 mb-4">Verification Error</h1>
-            <p className="text-slate-300 mb-6">{error}</p>
+            <p className="text-xs text-rose-300 tracking-[0.2em] mb-3">VERIFICATION INFO</p>
+            <h1 className="heading-display text-3xl text-rose-100 mb-4">Email Link Callback</h1>
+            <p className="text-slate-300 mb-6">
+              If you were redirected here after clicking an email verification link, your email should now be verified.
+            </p>
             <p className="text-sm text-slate-400 mb-8">
-              The verification link may have expired. Please register again or contact support.
+              You can now log in with your email and password.
             </p>
 
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-cyan-300 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25 transition-all w-full justify-center"
             >
-              Register Again
+              Go to Login
             </button>
           </>
         )}
 
         <p className="mt-6 text-xs text-slate-500">
-          Already have an account? <button onClick={() => navigate('/login')} className="text-cyan-300 hover:text-cyan-100">Login</button>
+          Back to <button onClick={() => navigate('/register')} className="text-cyan-300 hover:text-cyan-100">register</button> or <button onClick={() => navigate('/')} className="text-cyan-300 hover:text-cyan-100">home</button>
         </p>
       </div>
     </section>
