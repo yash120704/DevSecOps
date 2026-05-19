@@ -4,6 +4,7 @@ Django settings for policy_engine project.
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -129,8 +130,15 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
+def _normalize_origin(origin: str) -> str:
+    parsed = urlparse(origin.strip())
+    if not parsed.scheme or not parsed.netloc:
+        return origin.strip().rstrip('/')
+    return f'{parsed.scheme}://{parsed.netloc}'
+
+
 CORS_ALLOWED_ORIGINS = [
-    origin.strip()
+    _normalize_origin(origin)
     for origin in os.environ.get(
         'CORS_ALLOWED_ORIGINS',
         'http://localhost:5173,http://localhost:3000,https://dev-sec-ops-ruby.vercel.app'
