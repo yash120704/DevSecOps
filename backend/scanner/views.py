@@ -9,7 +9,9 @@ from rest_framework.views import APIView
 
 from .auth_serializers import ScanRequestSerializer, ScanReportSerializer, SearchHistorySerializer
 from .services.supabase_client import supabase
-from .tasks import run_scan_task
+from .services.repo_cloner import RepoCloner
+from .services.policy_engine import PolicyEngine
+from .services.report_builder import build_report
 from django.utils import timezone
 from datetime import timedelta
 
@@ -53,16 +55,50 @@ class ScanView(APIView):
             except Exception as e:
                 logger.warning(f"Failed to add to search history: {e}")
             
-            # Start async scan task with Supabase ID
+            # Start sync scan task (run directly, not via Celery)
             try:
-                run_scan_task.delay(scan_report['id'], user_id)
+                logger.info(f"Starting synchronous scan for report {scan_report['id']}")
+                
+                # Update status to running
+                supabase.update_scan_report(
+                    scan_report['id'],
+                    user_id,
+                    scan_status='running'
+                )
+                
+                # Clone and scan repository
+                repo_cloner = RepoCloner()
+                repo_path, repo_name = repo_cloner.clone(repo_url)
+                
+                # Run policy engine
+                policy_engine = PolicyEngine()
+                check_results = policy_engine.run(repo_path)
+                
+                # Build report
+                report = build_report(repo_url, repo_name, check_results)
+                
+                # Update scan report with results
+                supabase.update_scan_report(
+                    scan_report['id'],
+                    user_id,
+                    compliance_score=report['score'],
+                    risk_level=report['risk_level'],
+                    report_json=report,
+                    scan_status='completed'
+                )
+                
+                logger.info(f"Scan completed successfully: {scan_report['id']}")
+                
                 return Response({
                     'scan_id': scan_report['id'],
-                    'status': 'pending',
-                    'message': 'Scan initiated successfully'
-                }, status=status.HTTP_202_ACCEPTED)
+                    'status': 'completed',
+                    'message': 'Scan completed successfully',
+                    'compliance_score': report['score'],
+                    'risk_level': report['risk_level']
+                }, status=status.HTTP_200_OK)
+                
             except Exception as e:
-                logger.error(f"Failed to start scan task: {e}")
+                logger.error(f"Failed to run scan: {e}", exc_info=True)
                 # Update status to failed
                 supabase.update_scan_report(
                     scan_report['id'],
@@ -71,7 +107,7 @@ class ScanView(APIView):
                     error_message=str(e)
                 )
                 return Response({
-                    'error': 'Failed to start scan',
+                    'error': 'Failed to complete scan',
                     'message': str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
