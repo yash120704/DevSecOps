@@ -206,11 +206,24 @@ def _check_python_dependencies(repo_path: Path) -> dict:
                         'weight': 1.0,
                     }
                 else:
+                    # Extract detailed findings
+                    findings = []
+                    for vuln in high_severity:
+                        findings.append({
+                            'package': vuln.get('name', 'Unknown'),
+                            'version': vuln.get('installed_version', 'Unknown'),
+                            'severity': vuln.get('severity', 'Unknown').upper(),
+                            'id': vuln.get('id', 'Unknown'),
+                            'description': vuln.get('description', 'No description available'),
+                            'fixed_version': vuln.get('fixed_versions', ['Not available'])[0] if vuln.get('fixed_versions') else 'Not available',
+                        })
+                    
                     return {
                         'rule': 'DEPENDENCY_VULNERABILITIES',
                         'status': 'FAIL',
                         'details': f'Found {len(high_severity)} high severity vulnerabilities',
                         'weight': 1.0,
+                        'findings': findings[:20],  # Limit to 20
                     }
             except json.JSONDecodeError:
                 # If JSON parsing fails, check stderr
@@ -287,10 +300,17 @@ def _check_node_dependencies(repo_path: Path) -> dict:
             try:
                 audit_data = json.loads(audit_result.stdout)
                 vulnerabilities = audit_data.get('vulnerabilities', {})
-                high_severity = sum(1 for v in vulnerabilities.values() 
-                                   if v.get('severity') in ['high', 'critical'])
+                high_vulns = []
                 
-                if high_severity == 0:
+                for package_name, vuln_data in vulnerabilities.items():
+                    if vuln_data.get('severity') in ['high', 'critical']:
+                        high_vulns.append({
+                            'package': package_name,
+                            'severity': vuln_data.get('severity', 'unknown').upper(),
+                            'via': vuln_data.get('via', []),
+                        })
+                
+                if not high_vulns:
                     return {
                         'rule': 'DEPENDENCY_VULNERABILITIES',
                         'status': 'PASS',
@@ -298,11 +318,30 @@ def _check_node_dependencies(repo_path: Path) -> dict:
                         'weight': 1.0,
                     }
                 else:
+                    # Extract detailed findings
+                    findings = []
+                    for vuln in high_vulns:
+                        via_list = vuln.get('via', [])
+                        # Convert via items (which can be strings or dicts) to strings
+                        via_descriptions = []
+                        for v in via_list:
+                            if isinstance(v, dict):
+                                via_descriptions.append(f"{v.get('title', 'Unknown')} (CVE: {v.get('cves', ['N/A'])[0] if v.get('cves') else 'N/A'})")
+                            else:
+                                via_descriptions.append(str(v))
+                        
+                        findings.append({
+                            'package': vuln.get('package'),
+                            'severity': vuln.get('severity'),
+                            'vulnerabilities': ', '.join(via_descriptions[:3]),  # Limit to 3 descriptions
+                        })
+                    
                     return {
                         'rule': 'DEPENDENCY_VULNERABILITIES',
                         'status': 'FAIL',
-                        'details': f'Found {high_severity} high severity vulnerabilities',
+                        'details': f'Found {len(high_vulns)} high severity vulnerabilities',
                         'weight': 1.0,
+                        'findings': findings[:20],  # Limit to 20
                     }
             except json.JSONDecodeError:
                 return {

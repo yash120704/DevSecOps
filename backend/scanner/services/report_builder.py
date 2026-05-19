@@ -48,12 +48,14 @@ def build_report(repo_url: str, repo_name: str, check_results: dict) -> dict:
                     'module': module_name,
                     'rule': rule.get('rule'),
                     'details': rule.get('details'),
+                    'findings': rule.get('findings', []),  # Include detailed findings
                 })
             elif rule.get('status') == 'WARN':
                 warnings.append({
                     'module': module_name,
                     'rule': rule.get('rule'),
                     'details': rule.get('details'),
+                    'findings': rule.get('findings', []),  # Include detailed findings
                 })
     
     report['failures'] = failures
