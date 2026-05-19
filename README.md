@@ -174,14 +174,7 @@ DevSecOps/
 │   └── temp_scans/                  # Temporary cloned repos
 │
 ├── docker-compose.yml               # Multi-container orchestration
-├── SETUP.md                         # Detailed setup guide
-├── START_SERVICES.md                # Service startup instructions
-├── RESEARCH_PAPER.md                # Technical documentation
 ├── SUPABASE_SCHEMA.sql              # Database schema
-├── test-api.ps1                     # PowerShell API tests
-├── test-api.sh                      # Bash API tests
-├── start-all.bat                    # Windows startup script
-├── start-all.sh                     # Unix startup script
 └── README.md                        # This file
 ```
 
@@ -482,15 +475,6 @@ bash test-api.sh
 
 ---
 
-## 📚 Documentation
-
-- [Setup Guide](./SETUP.md) - Detailed installation instructions
-- [Service Management](./START_SERVICES.md) - How to run services
-- [Research Paper](./RESEARCH_PAPER.md) - Technical architecture
-- [Database Schema](./SUPABASE_SCHEMA.sql) - PostgreSQL schema
-
----
-
 ## 🎯 Future Improvements
 
 📌 **Phase 2 Features**
@@ -540,7 +524,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 **Yash Kashyap**
 
 - GitHub: [@yash120704](https://github.com/yash120704)
-- Email: yash@example.com
+- Email: yashkashyap1204@gmail.com
 
 ---
 
@@ -554,15 +538,5 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-## 📞 Support
-
-If you encounter any issues:
-
-1. Check the [SETUP.md](./SETUP.md) guide
-2. Review [RESEARCH_PAPER.md](./RESEARCH_PAPER.md) for architecture details
-3. Open an issue on GitHub
-4. Contact: yash@example.com
-
----
 
 **Happy Scanning! 🔒**
