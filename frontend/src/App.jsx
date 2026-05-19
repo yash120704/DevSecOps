@@ -10,6 +10,7 @@ import History from './pages/History';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VerificationSuccess from './pages/VerificationSuccess';
 import Report from './pages/Report';
 import ScanStatus from './pages/ScanStatus';
 
@@ -75,6 +76,10 @@ function AppRoutes() {
             element={
               isAuthenticated ? <Navigate to="/dashboard" replace /> : <PageTransition><Register /></PageTransition>
             }
+          />
+          <Route
+            path="/auth/callback"
+            element={<PageTransition><VerificationSuccess /></PageTransition>}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

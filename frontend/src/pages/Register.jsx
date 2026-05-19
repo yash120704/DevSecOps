@@ -8,7 +8,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [showVerificationPending, setShowVerificationPending] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -31,7 +31,6 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     if (!validateForm()) {
       return;
@@ -40,12 +39,9 @@ export default function Register() {
     setSubmitting(true);
 
     try {
-      const data = await register(email, password);
-      if (data?.session?.access_token) {
-        navigate('/dashboard');
-      } else {
-        setSuccess('Registration successful. Confirm your email, then log in.');
-      }
+      await register(email, password);
+      // Show verification pending page instead of redirecting
+      setShowVerificationPending(true);
     } catch (err) {
       const backendError = err.response?.data?.error;
       const validationErrors = err.response?.data;
@@ -61,6 +57,51 @@ export default function Register() {
       setSubmitting(false);
     }
   };
+
+  if (showVerificationPending) {
+    return (
+      <section className="min-h-[calc(100vh-68px)] flex items-center justify-center px-4 py-10">
+        <div className="glass-panel rounded-2xl p-8 w-full max-w-md text-center">
+          <div className="mb-6 flex justify-center">
+            <div className="p-4 rounded-full bg-cyan-500/20 border border-cyan-500/40">
+              <svg className="w-10 h-10 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+
+          <p className="text-xs text-cyan-300 tracking-[0.2em] mb-3">VERIFICATION REQUIRED</p>
+          <h1 className="heading-display text-3xl text-cyan-100 mb-4">Check Your Email</h1>
+
+          <p className="text-slate-300 mb-6">
+            We've sent a confirmation link to <strong>{email}</strong>. Please click the link in the email to verify your account.
+          </p>
+
+          <div className="bg-black/40 border border-cyan-500/20 rounded-lg p-4 mb-6">
+            <p className="text-sm text-slate-400">
+              <strong>Didn't receive an email?</strong> Check your spam folder or click the button below to register again.
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              setShowVerificationPending(false);
+              setEmail('');
+              setPassword('');
+              setConfirmPassword('');
+            }}
+            className="w-full rounded-lg px-4 py-3 border border-cyan-300 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25 mb-3"
+          >
+            REGISTER AGAIN
+          </button>
+
+          <p className="text-xs text-slate-500">
+            Already verified? <Link to="/login" className="text-cyan-300 hover:text-cyan-100">Login here</Link>
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-[calc(100vh-68px)] flex items-center justify-center px-4 py-10">
@@ -108,7 +149,6 @@ export default function Register() {
           </label>
 
           {error ? <p className="text-sm text-rose-300 border border-rose-500/40 rounded-lg px-3 py-2">{error}</p> : null}
-          {success ? <p className="text-sm text-lime-300 border border-lime-500/30 rounded-lg px-3 py-2">{success}</p> : null}
 
           <button
             type="submit"
@@ -120,7 +160,7 @@ export default function Register() {
         </form>
 
         <p className="mt-5 text-sm text-slate-300">
-          Already onboarded? <Link className="text-cyan-300 hover:text-cyan-100" to="/login">Login</Link>
+          Already have an account? <Link className="text-cyan-300 hover:text-cyan-100" to="/login">Login</Link>
         </p>
       </div>
     </section>
