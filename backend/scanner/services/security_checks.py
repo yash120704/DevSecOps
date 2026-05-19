@@ -284,14 +284,14 @@ def _check_node_dependencies(repo_path: Path) -> dict:
         }
     
     try:
-        # Run npm audit
-        # Note: npm audit returns exit code 1 when vulnerabilities are found, not an error
+        # Run npm audit with shorter timeout for production environments
+        # Free tier hosting may have slow npm, so we reduce timeout and handle gracefully
         audit_result = subprocess.run(
-            ['npm', 'audit', '--json'],
+            ['npm', 'audit', '--json', '--audit-level=moderate'],
             cwd=str(repo_path),
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=60,  # Reduced from 120 to 60 seconds for faster feedback
         )
         
         # npm audit exit codes: 0 = no vulns, 1 = vulns found, other = error
