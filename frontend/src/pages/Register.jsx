@@ -47,7 +47,16 @@ export default function Register() {
         setSuccess('Registration successful. Confirm your email, then log in.');
       }
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Registration failed');
+      const backendError = err.response?.data?.error;
+      const validationErrors = err.response?.data;
+      if (backendError) {
+        setError(backendError);
+      } else if (validationErrors && typeof validationErrors === 'object') {
+        const firstField = Object.values(validationErrors).flat?.()?.[0] || Object.values(validationErrors)[0];
+        setError(Array.isArray(firstField) ? firstField[0] : firstField || err.message || 'Registration failed');
+      } else {
+        setError(err.message || 'Registration failed');
+      }
     } finally {
       setSubmitting(false);
     }

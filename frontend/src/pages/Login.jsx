@@ -19,7 +19,16 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Login failed');
+      const backendError = err.response?.data?.error;
+      const validationErrors = err.response?.data;
+      if (backendError) {
+        setError(backendError);
+      } else if (validationErrors && typeof validationErrors === 'object') {
+        const firstField = Object.values(validationErrors).flat?.()?.[0] || Object.values(validationErrors)[0];
+        setError(Array.isArray(firstField) ? firstField[0] : firstField || err.message || 'Login failed');
+      } else {
+        setError(err.message || 'Login failed');
+      }
     } finally {
       setSubmitting(false);
     }
